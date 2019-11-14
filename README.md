@@ -154,3 +154,8 @@ which describes the flight route in the format
     - What other visualisations might help to answer these questions?
     
 (_Some of the airport co-ordinates are incorrect. Can you spot them?_)
+
+## Credits
+
+App developed by [Aaron MacFarlane](https://github.com/Beeblebroz)  
+Edited for public release by [Tim Morris](https://github.com/TimoMorris)
