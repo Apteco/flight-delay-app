@@ -4,7 +4,7 @@ An example web app using the py-apteco and apteco-api Python packages
 ## Pre-requisites
 - Python 3.7 installed (for this readme, it is executed by the command `python`)
 - pip 19.* installed
-- The _Flight Delays_ FastStats system
+- The _Flight Delays_ FastStats system with Apteco Orbit™ set up.
 
 ## Installation
 1. Clone the GitHub repository  
@@ -23,7 +23,7 @@ An example web app using the py-apteco and apteco-api Python packages
     `python manage.py createsuperuser`  
     Enter details (username, password, _email is optional_)
 
-## Setting up FastStats system
+## Setting up the FastStats system
 
 ### Creating virtual variables
 
@@ -91,7 +91,7 @@ which describes the flight route in the format
   are defined as constants in the file `example_app\fs_var_names.py`
   which are then imported by other modules within the project.
 - These names are the FastStats short variable _reference_ (up to 8 characters long),
-  as opposed to the _description_ which you normally see in System Explorer.
+  as opposed to the _description_ which you normally see in the System Explorer.
 - If you are using an unchanged copy of the original system
   these should mostly be the same,
   but the names of the virtual variables created in the previous section

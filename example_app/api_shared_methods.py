@@ -24,7 +24,7 @@ def get_selector_variable_codes(session, var_name):
         ]  # Make unclassifid code ('!') human readable
         return codes
     except aa.ApiException:  # If var_name doesn't exist in system
-        print("Variable id doesn't exist in system")
+        print(f"Variable id '{var_name}' doesn't exist in system")
         return None
 
 
