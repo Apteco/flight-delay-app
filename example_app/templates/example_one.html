@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<p><b>Calculates the number of flight routes between origin airport and destination airport.</b></p>
+<br>
+
+<form action="{% url 'example_one_count' %}" method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="form-group col-md-3" style="margin-right:10px;">
+            <label for="origin_code">Select origin airport:</label>
+            <select class="form-control" id="origin_code" name="origin_code">
+                {% for code in origin_codes %}
+                <option {% if selected_origin == code %} selected {% endif %}>{{code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="dest_code" style="white-space: nowrap;">Select destination airport:</label>
+            <select class="form-control" id="dest_code" name="dest_code">
+                {% for code in dest_codes %}
+                <option {% if selected_dest == code %} selected {% endif %}>{{code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-2" style="margin-top:32px; margin-left:10px;">
+            <button type="submit" class="btn btn-primary">Count</button>
+        </div>
+    </div>
+</form>
+
+{% if count or count == 0 %}
+<h2>{{count}} flight routes were found between {{selected_origin_title}} and {{selected_dest_title}}</h2>
+{% endif %}
+
+{% endblock content %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<p><b>Calculates the number of flight routes per measure over all time, or over a given year.</b></p>
+<br>
+
+<form action="{% url 'example_two_graph' %}" method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="form-group col-md-3" style="margin-right:10px;margin-left:14px;">
+            <label for="first_selector">Select measure:</label>
+            <select class="form-control" id="first_selector" name="first_selector">
+                {% for col in selector_cols %}
+                <option {% if first_selected_col == col %} selected {% endif %}>{{col}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-3" style="margin-right:10px;">
+            <label for="top_choice">Choose how many to show:</label>
+            <select class="form-control" id="top_choice" name="top_choice">
+                <option value="10" {% if selected_top_choice == '10' %} selected {% endif %}>Top 10</option>
+                <option value="100" {% if selected_top_choice == '100' %} selected {% endif %}>Top 100</option>
+                <option value="0" {% if selected_top_choice == '0' %} selected {% endif %}>Show all</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3" style="margin-left:14px;">
+            <label for="date_option" style="white-space: nowrap;">Select year:</label>
+            <select class="form-control" id="date_option" name="date_option">
+                {% for year in years %}
+                <option {% if selected_year == year %} selected {% endif %}>{{year}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-md-2" style="margin-top:5px;">
+        <button type="submit" class="btn btn-primary">Show graph</button>
+    </div>
+</form>
+
+{% if graph %}
+{{graph|safe}}
+{% endif %}
+
+{% endblock content %}

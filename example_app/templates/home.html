@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Welcome to your home page!</h1>
+
+{% if request.session.ApiSession %}
+
+<br>
+<h2>FastStats Session Details:</h2>
+    <div style="margin-left:20px;">
+        <h4>Data view: &emsp;&ensp; <span style="color:cornflowerblue;" >{{data_view}}</span></h4>
+        <h4>System name: &nbsp; <span style="color:coral;" >{{system_name}}</span></h4>
+<!--        <h4>Access token: &nbsp; <span style="color:coral;" >{{access_token}}</span></h4>-->
+<!--        <h4>Session ID: &nbsp; <span style="color:coral;" >{{session_id}}</span></h4>-->
+    </div>
+
+{% else %}
+<h2>You don't seem to be connected to a FastStats system.</h2>
+<a class="btn btn-success" href="{% url 'login_api' %}">Connect</a>
+
+{% endif %}
+
+{% endblock content %}

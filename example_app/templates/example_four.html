@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<p style="display:inline;"><b>Shows the number of flight routes taken to different destinations by a particular airline over all time, or over a particular year.</b></p>
+<p><i>Optional: Only show flight routes from a given airport.</i></p>
+<br>
+
+<form action="{% url 'example_four_map' %}" method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="form-group col-md-3" style="margin-right:10px;margin-left:16px;">
+            <label for="airline_name">Select airline:</label>
+            <select class="form-control" id="airline_name" name="airline_name">
+                {% for name in airline_names %}
+                <option {% if selected_airline == name %} selected {% endif %}>{{name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group col-md-3" style="margin-right:10px;">
+            <label for="year">Select year:</label>
+            <select class="form-control" id="year" name="year">
+                {% for year in years %}
+                <option {% if selected_year == year %} selected {% endif %}>{{year}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-3" style="margin-left:16px;">
+            <label for="reporting_airport">Select origin airport <i>(optional):</i></label>
+            <select class="form-control" id="reporting_airport" name="reporting_airport">
+                {% for airport in reporting_airports %}
+                <option {% if selected_airport == airport %} selected {% endif %}>{{airport}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-md-2" style="margin-top:5px;">
+        <button type="submit" class="btn btn-primary">Show map</button>
+    </div>
+</form>
+
+{% if graph %}
+{{graph|safe}}
+{% endif %}
+
+{% endblock content %}
