@@ -6,7 +6,7 @@ from django.contrib.auth import logout as dj_logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .api_shared_methods import get_codes_with_filter, get_selector_variable_codes
+from .api_shared_methods import get_codes_with_filter, get_reporting_years
 from .example_four_code import get_example_four_dataframe, make_example_four_map
 from .example_one_code import get_example_one_count
 from .example_three_code import get_example_three_dataframe, make_example_three_map
@@ -16,7 +16,6 @@ from .fs_var_names import (
     AIRLINE_NAME_CODE,
     ORIGIN_DESTINATION_CODE,
     REPORTING_AIRPORT_CODE,
-    REPORTING_PERIOD_YEARS_CODE,
 )
 
 EXAMPLE_ONE_DESTS = ["Malaga", "Faro", "Las Palmas", "Malta"]
@@ -216,10 +215,7 @@ def example_two(request, context=None):
         return no_session_set(request)
     session = Session.deserialize(session)
 
-    reporting_years = get_selector_variable_codes(session, REPORTING_PERIOD_YEARS_CODE)
-    reporting_years[
-        0
-    ] = "Show All Years"  # Remove '0000' year and include show all option
+    reporting_years = get_reporting_years(session)
     context.update(
         {
             "title": "Example 2",
@@ -320,14 +316,13 @@ def example_four(request, context=None):
     airline_names = get_codes_with_filter(session, AIRLINE_NAME_CODE, 10001)
     airport_names = get_codes_with_filter(session, REPORTING_AIRPORT_CODE, 0)
     airport_names.insert(0, " ")  # First option is blank
-    years = get_selector_variable_codes(session, REPORTING_PERIOD_YEARS_CODE)
-    years[0] = "Show All Years"  # Remove '0000' year and include show all option
+    reporting_years = get_reporting_years(session)
     context.update(
         {
             "title": "Example 4",
             "active": "example_four",
             "airline_names": airline_names,
-            "years": years,
+            "years": reporting_years,
             "reporting_airports": airport_names,
         }
     )
@@ -375,11 +370,8 @@ def example_four_map(request):
 
 # Helper functions
 def start_session(username, password, url, system_name, data_view):
-    try:
-        session = login_with_password(url, data_view, system_name, username, password)
-        return session
-    except aa.ApiException:
-        return None
+    session = login_with_password(url, data_view, system_name, username, password)
+    return session
 
 
 def not_logged_in(request):

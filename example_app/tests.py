@@ -1,9 +1,8 @@
-import apteco_api as aa
 from apteco.session import Session
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase
 
-from .api_shared_methods import get_codes_with_filter, get_selector_variable_codes
+from .api_shared_methods import get_codes_with_filter, get_reporting_years
 from .example_four_code import (
     get_example_four_cube,
     get_example_four_dataframe,
@@ -41,23 +40,10 @@ class TestSessionCreation(TestCase):
 
 
 class TestApiEndpoints(TestCase):
-    def setUp(self):
-        self.codes = get_selector_variable_codes(session, REPORTING_AIRPORT_CODE)
-
-    def test_variable_codes(self):
-        self.assertNotEqual(
-            self.codes, None, "Can't get variables codes through OrbitAPI"
-        )
-        self.assertTrue(any("Heathrow" in code for code in self.codes))
-
     def test_count_with_var_codes(self):
-        try:
-            aberdeen = str(self.codes[1].upper())
-            flights_from_aberdeen = airports[REPORTING_AIRPORT_CODE] == aberdeen
-            query_count = (routes * flights_from_aberdeen).count()
-            self.assertEqual(query_count, 4540)
-        except aa.ApiException:
-            self.assertTrue(False, "ApiException in getting variable codes")
+        aberdeen_airport = airports[REPORTING_AIRPORT_CODE] == "ABERDEEN"
+        flights_from_aberdeen = (routes * aberdeen_airport).count()
+        self.assertEqual(flights_from_aberdeen, 4540)
 
     def test_datagrid(self):
         malaga_las_palmas = routes[ORIGIN_DESTINATION_CODE] == ["MALAGA", "LAS PALMAS"]
@@ -87,10 +73,11 @@ class TestSharedExampleLogic(TestCase):
         self.assertEqual(len(codes), 19)
         self.assertEqual(codes[10], "Flybe Ltd")
 
-    def test_get_selector_variable_codes(self):
-        codes = get_selector_variable_codes(session, ORIGIN_DESTINATION_CODE)
-        self.assertEqual(len(codes), 1261)
-        self.assertEqual(codes[0], "Unclassified")
+    def test_get_reporting_years(self):
+        reporting_years = get_reporting_years(session)
+        self.assertEqual(len(reporting_years), 24)
+        self.assertEqual(reporting_years[0], "Show All Years")
+        self.assertEqual(reporting_years[8], "2002")
 
 
 class TestExampleOneLogic(TestCase):

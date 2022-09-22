@@ -1,28 +1,6 @@
 import io
 
-import apteco_api as aa
-
-
-def get_selector_variable_codes(session, var_name):
-    """Return list of codes possible for a selector variable."""
-    api_client = session.api_client
-    fss_api = aa.FastStatsSystemsApi(api_client)
-    try:
-        all_var_codes = fss_api.fast_stats_systems_get_fast_stats_variable_codes(
-            session.data_view,
-            session.system,
-            var_name,
-            count=2000,  # Show top 2000 codes
-        )
-        # Get codes without whitespace after code and in title format
-        codes = [str(varcode.code).strip().title() for varcode in all_var_codes.list]
-        codes = [
-            "Unclassified" if i == "!" else i for i in codes
-        ]  # Make unclassifid code ('!') human readable
-        return codes
-    except aa.ApiException:  # If var_name doesn't exist in system
-        print(f"Variable id '{var_name}' doesn't exist in system")
-        return None
+from example_app.fs_var_names import REPORTING_PERIOD_CODE
 
 
 def get_codes_with_filter(session, varcode, limit=0):
@@ -36,6 +14,16 @@ def get_codes_with_filter(session, varcode, limit=0):
     variable_descs = [desc.title() for desc in filtered_df.index.to_list()]
 
     return variable_descs
+
+
+def get_reporting_years(session):
+    """Return list of options for reporting years."""
+    reporting_period_var = session.variables[REPORTING_PERIOD_CODE]
+
+    year_range = range(reporting_period_var.min_date.year, reporting_period_var.max_date.year + 1)
+    reporting_years = ["Show All Years"] + [str(year) for year in year_range]
+
+    return reporting_years
 
 
 def create_and_filter_cube_dataframe(cube, selected_year):
