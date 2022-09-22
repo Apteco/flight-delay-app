@@ -1,8 +1,7 @@
-import pandas as pd
 from plotly import graph_objects as go
 
 from .api_shared_methods import get_html, create_and_filter_cube_dataframe
-from .fs_var_names import REPORTING_PERIOD_YEARS_CODE
+from .fs_var_names import REPORTING_PERIOD_CODE, REPORTING_PERIOD_YEARS_CODE
 
 # Used for the x axis in example two graph
 MONTHS = [
@@ -21,15 +20,12 @@ MONTHS = [
 ]
 
 
-def get_example_two_dataframe(session, measure_var_code, date_var_code, selected_year, limit):
+def get_example_two_dataframe(session, measure_var_code, selected_year, limit):
     """Create dataframe for example two graph, filtered by top selectors if set."""
-    measure_var = session.variables[measure_var_code]
-    date_var = session.variables[date_var_code]
-    measure_var_desc = measure_var.description
-    date_var_desc = date_var.description
+    measure_var_desc = session.variables[measure_var_code].description
 
-    cube = get_example_two_cube(session, measure_var_code, date_var_code, selected_year=selected_year)
-    df = create_and_filter_cube_dataframe(cube, date_var_desc, selected_year)
+    cube = get_example_two_cube(session, measure_var_code, selected_year=selected_year)
+    df = create_and_filter_cube_dataframe(cube, selected_year)
 
     # Filter the dataframe to only return rows regarding the top selectors
     if limit > 0:
@@ -38,24 +34,28 @@ def get_example_two_dataframe(session, measure_var_code, date_var_code, selected
     return df
 
 
-def get_example_two_cube(session, measure_var_code, date_var_code, selected_year=None):
+def get_example_two_cube(session, measure_var_code, selected_year=None):
     """Create 2D cube of flight routes per 'measure' variable, per date selector."""
     routes = session.tables["Flight Route"]
 
     # If specified, only return flight counts for the selected year
     if selected_year is not None:
         query = routes[REPORTING_PERIOD_YEARS_CODE] == selected_year
+        date_dim = routes[REPORTING_PERIOD_CODE].month
     # Else, no underlying base query
     else:
         query = None
+        date_dim = routes[REPORTING_PERIOD_CODE].year
 
-    dimensions = [session.variables[code] for code in (measure_var_code, date_var_code)]
+    dimensions = [session.variables[measure_var_code], date_dim]
     cube = routes.cube(dimensions, selection=query)
     return cube
 
 
-def make_example_two_graph(df: pd.DataFrame, measure_var_desc, year=None):
+def make_example_two_graph(df, measure_var_desc, year=None):
     """Return HTML for plotly graph of number of flights over time per 'measure'."""
+    df.loc[:, "Date"] = df.loc[:, "Date"].dt.to_timestamp()
+
     fig = go.Figure(data=go.Scatter())
 
     # Add line trace for each selector description

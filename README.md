@@ -28,11 +28,11 @@ An example web app using the py-apteco and apteco-api Python packages
 ### Creating virtual variables
 
 - The web app uses the _Flight Delays_ FastStats system.
-- It requires three virtual variables
+- It requires two virtual variables
   which need to be created before the app can be used.
 - The steps below explain how to do this.
 
-#### 1. Reporting Period Month
+#### 1. Reporting Period Year
     
 This is a combined categories virtual variable
 created from the Reporting Period variable.
@@ -41,28 +41,13 @@ created from the Reporting Period variable.
 select _Combine Categories_ from the _Virtual Variable Wizards_ section
 2. Select **Rules Based Creation**
 3. Drag on **Reporting Period** as the source variable
-4. Set the rule to use **6** characters for grouping
-5. No changes are needed on the _Summary Descriptions_ section
-6. Enter notes if desired on the _Add Notes_ section
-7. Set the description to **Reporting Period Month**
-8. Click **Finish** to exit the wizard
-
-#### 2. Reporting Period Year
-This is a combined categories virtual variable
-based on the Reporting Period Month variable, created in part 1 above,
-and follows a similar series of steps as when creating that:
-
-1. Under the _Wizards_ ribbon,
-select _Combine Categories_ from the _Virtual Variable Wizards_ section
-2. Select **Rules Based Creation**
-3. Drag on **Reporting Period Month** as the source variable
 4. Set the rule to use **4** characters for grouping
 5. No changes are needed on the _Summary Descriptions_ section
 6. Enter notes if desired on the _Add Notes_ section
 7. Set the description to **Reporting Period Year**
 8. Click **Finish** to exit the wizard
 
-#### 3. Flight Route Name  
+#### 2. Flight Route Name  
 This is a calculate expression virtual variable
 which describes the flight route in the format  
 `<Reporting Airport> - <Origin Destination>`

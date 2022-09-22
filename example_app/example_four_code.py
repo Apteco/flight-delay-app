@@ -8,26 +8,20 @@ from .fs_var_names import (
     REPORTING_AIRPORT_CODE,
     ORIGIN_AIRPORT_LATITUDE,
     ORIGIN_AIRPORT_LONGITUDE,
-    REPORTING_PERIOD_MONTHS_CODE,
+    REPORTING_PERIOD_CODE,
     REPORTING_PERIOD_YEARS_CODE,
 )
 
 
 def get_example_four_dataframe(session, airline, year, reporting_airport=None):
     """Create dataframe by merging the cube and datagrid results together."""
-    if year is None:
-        varcodes = [ORIGIN_DESTINATION_CODE, REPORTING_PERIOD_YEARS_CODE]
-        reporting_period_desc = "Reporting Period Year"
-    else:
-        varcodes = [ORIGIN_DESTINATION_CODE, REPORTING_PERIOD_MONTHS_CODE]
-        reporting_period_desc = "Reporting Period Month"
 
     airline = airline.upper()
     if reporting_airport is not None:
         reporting_airport = reporting_airport.upper()
 
-    cube = get_example_four_cube(session, varcodes, airline, year, reporting_airport)
-    cube_df = create_and_filter_cube_dataframe(cube, reporting_period_desc, year)
+    cube = get_example_four_cube(session, airline, year, reporting_airport)
+    cube_df = create_and_filter_cube_dataframe(cube, year)
 
     datagrid = get_example_four_datagrid(session, airline)
     datagrid_df = datagrid.to_df()
@@ -43,7 +37,6 @@ def get_example_four_dataframe(session, airline, year, reporting_airport=None):
 
 def get_example_four_cube(
     session,
-    varcodes,
     selected_airline,
     selected_year=None,
     selected_reporting_airport=None,
@@ -58,7 +51,12 @@ def get_example_four_cube(
     if selected_reporting_airport is not None:
         selection &= airports[REPORTING_AIRPORT_CODE] == selected_reporting_airport
 
-    cube = selection.cube([routes[vc] for vc in varcodes])
+    if selected_year is not None:
+        date_dim = routes[REPORTING_PERIOD_CODE].month
+    else:
+        date_dim = routes[REPORTING_PERIOD_CODE].year
+
+    cube = selection.cube([routes[ORIGIN_DESTINATION_CODE], date_dim])
     return cube
 
 
@@ -81,13 +79,15 @@ def get_example_four_datagrid(session, airline):
     return datagrid
 
 
-def make_example_four_map(df: pd.DataFrame):
+def make_example_four_map(df):
     """Get HTML for plotly bubble map of airline flight routes to destinations."""
+    date_banding = df["Date"].array.resolution.title()
+
     fig = px.scatter_geo(
         df,
         lat="Origin Airport Latitude",
         lon="Origin Airport Longitude",
-        animation_frame="Month" if "Month" in df.columns else "Year",
+        animation_frame=date_banding,
         text="Origin Destination",
         size_max=30,
         size="Flight Routes",

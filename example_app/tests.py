@@ -19,8 +19,7 @@ from .fs_var_names import (
     ORIGIN_AIRPORT_LATITUDE,
     ORIGIN_AIRPORT_LONGITUDE,
     REPORTING_AIRPORT_CODE,
-    REPORTING_PERIOD_MONTHS_CODE,
-    REPORTING_PERIOD_YEARS_CODE,
+    REPORTING_PERIOD_CODE,
 )
 from .views import start_session
 
@@ -68,7 +67,7 @@ class TestApiEndpoints(TestCase):
         self.assertEqual(test_row, ("   36.674900", "   -4.499110"))
 
     def test_cube(self):
-        dims = [routes[REPORTING_PERIOD_YEARS_CODE], airports[REPORTING_AIRPORT_CODE]]
+        dims = [routes[REPORTING_PERIOD_CODE].year, airports[REPORTING_AIRPORT_CODE]]
         cube = routes.cube(dims)
         test_row = cube._data[0][:, 7].tolist()
         self.assertEqual(
@@ -107,13 +106,13 @@ class TestExampleOneLogic(TestCase):
 class TestExampleTwoLogic(TestCase):
     def test_example_two_dataframe_all_years_no_limit(self):
         expected_counts = [0, 1818, 2666, 2850, 2805, 2471, 3181, 3193, 2942, 3217, 3286, 3564, 3623, 3595, 3010, 2829, 2711, 2682, 2681, 2814, 2793, 3347, 2961]
-        df = get_example_two_dataframe(session, REPORTING_AIRPORT_CODE, REPORTING_PERIOD_YEARS_CODE, None, 0)
+        df = get_example_two_dataframe(session, REPORTING_AIRPORT_CODE, None, 0)
         newcastle_counts = df.loc[df["Reporting Airport"] == "NEWCASTLE"]["Flight Routes"].to_list()
         self.assertEqual(newcastle_counts, expected_counts)
 
     def test_example_two_dataframe_selected_year_limit_10(self):
         expected_counts = [384, 638, 381, 191, 203, 84, 596, 175, 406, 84]
-        df = get_example_two_dataframe(session, AIRLINE_NAME_CODE, REPORTING_PERIOD_MONTHS_CODE, "2015", 10)
+        df = get_example_two_dataframe(session, AIRLINE_NAME_CODE, "2015", 10)
         jan15_counts = df.loc[df["Date"] == "20150101"]["Flight Routes"].to_list()
         self.assertEqual(jan15_counts, expected_counts)
 
@@ -138,13 +137,7 @@ class TestExampleThreeLogic(TestCase):
 
 class TestExampleFourLogic(TestCase):
     def test_example_four_cube(self):
-        cube = get_example_four_cube(
-            session,
-            [ORIGIN_DESTINATION_CODE, REPORTING_PERIOD_YEARS_CODE],
-            "RYANAIR",
-            None,
-            "GATWICK",
-        )
+        cube = get_example_four_cube(session, "RYANAIR", None, "GATWICK")
         df = cube.to_df().reset_index()
         expected_counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 24, 24, 22, 16, 20, 24, 20]
         seville_counts = df[df["Origin Destination"] == "SEVILLE"]["Flight Routes"].to_list()

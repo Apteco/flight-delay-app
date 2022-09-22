@@ -1,7 +1,6 @@
 import io
 
 import apteco_api as aa
-import pandas as pd
 
 
 def get_selector_variable_codes(session, var_name):
@@ -39,15 +38,20 @@ def get_codes_with_filter(session, varcode, limit=0):
     return variable_descs
 
 
-def create_and_filter_cube_dataframe(cube, date_var_desc, selected_year):
+def create_and_filter_cube_dataframe(cube, selected_year):
     """Create dataframe based on cube, filtered to selected year."""
+
+    if selected_year is not None:
+        date_var_desc = "Reporting Period (Month)"
+        new_col_name = "Month"
+        new_col_fmt = "%B"
+    else:
+        date_var_desc = "Reporting Period (Year)"
+        new_col_name = "Year"
+        new_col_fmt = "%Y"
+
     df = cube.to_df().reset_index().rename(columns={date_var_desc: "Date"})
-    try:
-        df.loc[:, "Date"] = pd.to_datetime(df.loc[:, "Date"], format="%Y%m")
-        df.loc[:, "Month"] = df.loc[:, "Date"].dt.strftime("%B")
-    except ValueError:
-        df.loc[:, "Date"] = pd.to_datetime(df.loc[:, "Date"], format="%Y")
-        df.loc[:, "Year"] = df.loc[:, "Date"].dt.strftime("%Y")
+    df.loc[:, new_col_name] = df.loc[:, "Date"].dt.strftime(new_col_fmt)
 
     if selected_year is not None:
         df = df[df.loc[:, "Date"].dt.year == int(selected_year)]

@@ -16,7 +16,6 @@ from .fs_var_names import (
     AIRLINE_NAME_CODE,
     ORIGIN_DESTINATION_CODE,
     REPORTING_AIRPORT_CODE,
-    REPORTING_PERIOD_MONTHS_CODE,
     REPORTING_PERIOD_YEARS_CODE,
 )
 
@@ -226,7 +225,6 @@ def example_two(request, context=None):
             "title": "Example 2",
             "active": "example_two",
             "selector_cols": EXAMPLE_TWO_SELECTORS,
-            "date_options": ["Years", "Months"],
             "years": reporting_years,
         }
     )
@@ -251,14 +249,12 @@ def example_two_graph(request):
 
         if date_option == "Show All Years":
             selected_year = None
-            date_selector_code = REPORTING_PERIOD_YEARS_CODE
         else:
             selected_year = date_option
-            date_selector_code = REPORTING_PERIOD_MONTHS_CODE
 
         limit = int(top_pick)  # if limit = 0, same as None
 
-        df = get_example_two_dataframe(session, measure_selector_code, date_selector_code, selected_year, limit)
+        df = get_example_two_dataframe(session, measure_selector_code, selected_year, limit)
         graph_html = make_example_two_graph(df, measure_var_desc, selected_year)
         context = {
             "first_selected_col": first_selector,
@@ -359,9 +355,7 @@ def example_four_map(request):
         if reporting_airport == "":
             reporting_airport = None
 
-        df = get_example_four_dataframe(
-            session, airline, selected_year, reporting_airport
-        )
+        df = get_example_four_dataframe(session, airline, selected_year, reporting_airport)
 
         if (df["Flight Routes"] == 0).all():
             graph_html = """<div class="alert alert-danger" role="alert" style="margin-left:14px;">
