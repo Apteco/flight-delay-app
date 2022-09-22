@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from .api_shared_methods import get_codes_with_filter, get_selector_variable_codes
 from .example_four_code import get_example_four_dataframe, make_example_four_map
 from .example_one_code import route_counts
-from .example_three_code import get_export_as_dataframe, make_example_three_map
+from .example_three_code import get_datagrid_as_dataframe, make_example_three_map
 from .example_two_code import get_example_two_dataframe, make_example_two_graph
 from .forms import LoginApiForm, LoginUserForm
 from .fs_var_names import (
@@ -247,6 +247,7 @@ def example_two_graph(request):
         top_pick = request.POST["top_choice"]
 
         measure_selector_code = encode_variable(first_selector)
+        measure_var_desc = session.variables[measure_selector_code].description
 
         if date_option == "Show All Years":
             selected_year = None
@@ -257,13 +258,8 @@ def example_two_graph(request):
 
         limit = int(top_pick)  # if limit = 0, same as None
 
-        df = get_example_two_dataframe(
-            session,
-            [measure_selector_code, date_selector_code],
-            selected_year=selected_year,
-            limit=limit,
-        )
-        graph_html = make_example_two_graph(df, selected_year)
+        df = get_example_two_dataframe(session, measure_selector_code, date_selector_code, selected_year, limit)
+        graph_html = make_example_two_graph(df, measure_var_desc, selected_year)
         context = {
             "first_selected_col": first_selector,
             "selected_year": date_option,
@@ -308,7 +304,7 @@ def example_three_map(request):
 
         reporting_airport = request.POST["reporting_airport"]
 
-        df = get_export_as_dataframe(session, reporting_airport.upper())
+        df = get_datagrid_as_dataframe(session, reporting_airport.upper())
         graph_html = make_example_three_map(df)
         context = {"graph": graph_html, "selected_airport": reporting_airport}
         return example_three(request, context)
@@ -367,7 +363,7 @@ def example_four_map(request):
             session, airline, selected_year, reporting_airport
         )
 
-        if (df["routes"] == 0).all():
+        if (df["Flight Routes"] == 0).all():
             graph_html = """<div class="alert alert-danger" role="alert" style="margin-left:14px;">
                                 No flight routes were found in this selection
                             </div>"""
@@ -386,8 +382,7 @@ def example_four_map(request):
 # Helper functions
 def start_session(username, password, url, system_name, data_view):
     try:
-        credentials = login_with_password(url, data_view, username, password)
-        session = Session(credentials, system_name)
+        session = login_with_password(url, data_view, system_name, username, password)
         return session
     except aa.ApiException:
         return None
@@ -431,7 +426,7 @@ def encode_variable(var):
         "Destination": ORIGIN_DESTINATION_CODE,
     }
     try:
-        return codec.get(var, var)
+        return codec[var]
     except KeyError:
         print(f"Encoding '{var}' is not defined")
         return None
