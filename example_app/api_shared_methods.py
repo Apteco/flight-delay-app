@@ -1,4 +1,4 @@
-import os
+import io
 
 import apteco_api as aa
 import pandas as pd
@@ -18,7 +18,7 @@ def get_selector_variable_codes(session, var_name):
         # Get codes without whitespace after code and in title format
         codes = [str(varcode.code).strip().title() for varcode in all_var_codes.list]
         codes = [
-            i if i != "!" else "Unclassified" for i in codes
+            "Unclassified" if i == "!" else i for i in codes
         ]  # Make unclassifid code ('!') human readable
         return codes
     except aa.ApiException:  # If var_name doesn't exist in system
@@ -39,7 +39,7 @@ def get_codes_with_filter(session, varcode, limit=0):
     return variable_descs
 
 
-def make_cube_dataframe(cube, date_var_desc, selected_year):
+def create_and_filter_cube_dataframe(cube, date_var_desc, selected_year):
     """Create dataframe based on cube, filtered to selected year."""
     df = cube.to_df().reset_index().rename(columns={date_var_desc: "Date"})
     try:
@@ -57,8 +57,6 @@ def make_cube_dataframe(cube, date_var_desc, selected_year):
 
 def get_html(fig):
     """Return HTML for plotly figure."""
-    fig.write_html("fig.html", full_html=False)
-    with open("fig.html", "r") as file:
-        html = file.read()
-    os.remove("fig.html")
-    return html
+    with io.StringIO() as file:
+        fig.write_html(file, full_html=False)
+        return file.getvalue()

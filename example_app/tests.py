@@ -9,8 +9,8 @@ from .example_four_code import (
     get_example_four_dataframe,
     get_example_four_datagrid,
 )
-from .example_one_code import route_counts
-from .example_three_code import get_datagrid_as_dataframe
+from .example_one_code import get_example_one_count
+from .example_three_code import get_example_three_dataframe
 from .example_two_code import get_example_two_dataframe
 from .fs_credentials import DATA_VIEW, PASSWORD, SYSTEM_NAME, URL, USERNAME
 from .fs_var_names import (
@@ -96,11 +96,11 @@ class TestSharedExampleLogic(TestCase):
 
 class TestExampleOneLogic(TestCase):
     def test_nonzero_count(self):
-        count = route_counts(session, "ABERDEEN", "FARO")
+        count = get_example_one_count(session, "ABERDEEN", "FARO")
         self.assertEqual(count, 48)
 
     def test_zero_count(self):
-        count = route_counts(session, "JERSEY", "MALTA")
+        count = get_example_one_count(session, "JERSEY", "MALTA")
         self.assertEqual(count, 0)
 
 
@@ -120,7 +120,7 @@ class TestExampleTwoLogic(TestCase):
 
 class TestExampleThreeLogic(TestCase):
     def setUp(self):
-        self.df = get_datagrid_as_dataframe(session, "EXETER")
+        self.df = get_example_three_dataframe(session, "EXETER")
 
     def test_example_three_dataframe_shape(self):
         self.assertEqual(self.df.shape, (114, 5))

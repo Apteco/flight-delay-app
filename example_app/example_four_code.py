@@ -1,7 +1,7 @@
 import pandas as pd
 from plotly import express as px
 
-from .api_shared_methods import make_cube_dataframe, get_html
+from .api_shared_methods import create_and_filter_cube_dataframe, get_html
 from .fs_var_names import (
     AIRLINE_NAME_CODE,
     ORIGIN_DESTINATION_CODE,
@@ -27,7 +27,7 @@ def get_example_four_dataframe(session, airline, year, reporting_airport=None):
         reporting_airport = reporting_airport.upper()
 
     cube = get_example_four_cube(session, varcodes, airline, year, reporting_airport)
-    cube_df = make_cube_dataframe(cube, reporting_period_desc, year)
+    cube_df = create_and_filter_cube_dataframe(cube, reporting_period_desc, year)
 
     datagrid = get_example_four_datagrid(session, airline)
     datagrid_df = datagrid.to_df()

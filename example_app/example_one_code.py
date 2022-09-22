@@ -1,8 +1,8 @@
 from .fs_var_names import ORIGIN_DESTINATION_CODE, REPORTING_AIRPORT_CODE
 
 
-def route_counts(session, origin_code, dest_code):
-    """ Get count of flight routes between origin and dest. """
+def get_example_one_count(session, origin_code, dest_code):
+    """Get count of flight routes between origin and dest."""
     routes = session.tables["Flight Route"]
     airports = session.tables["Reporting Airport"]
 

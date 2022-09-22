@@ -1,7 +1,7 @@
 import pandas as pd
 from plotly import graph_objects as go
 
-from .api_shared_methods import get_html, make_cube_dataframe
+from .api_shared_methods import get_html, create_and_filter_cube_dataframe
 from .fs_var_names import REPORTING_PERIOD_YEARS_CODE
 
 # Used for the x axis in example two graph
@@ -29,7 +29,7 @@ def get_example_two_dataframe(session, measure_var_code, date_var_code, selected
     date_var_desc = date_var.description
 
     cube = get_example_two_cube(session, measure_var_code, date_var_code, selected_year=selected_year)
-    df = make_cube_dataframe(cube, date_var_desc, selected_year)
+    df = create_and_filter_cube_dataframe(cube, date_var_desc, selected_year)
 
     # Filter the dataframe to only return rows regarding the top selectors
     if limit > 0:

@@ -8,8 +8,8 @@ from django.shortcuts import redirect, render
 
 from .api_shared_methods import get_codes_with_filter, get_selector_variable_codes
 from .example_four_code import get_example_four_dataframe, make_example_four_map
-from .example_one_code import route_counts
-from .example_three_code import get_datagrid_as_dataframe, make_example_three_map
+from .example_one_code import get_example_one_count
+from .example_three_code import get_example_three_dataframe, make_example_three_map
 from .example_two_code import get_example_two_dataframe, make_example_two_graph
 from .forms import LoginApiForm, LoginUserForm
 from .fs_var_names import (
@@ -25,7 +25,7 @@ EXAMPLE_TWO_SELECTORS = ["Reporting Airport", "Airline Name", "Destination"]
 
 
 def index(request, context=None):
-    """  Return the home page. """
+    """ Return the home page."""
     if context is None:
         context = {}
     context.update({"title": "Index Page", "active": "home"})
@@ -37,7 +37,7 @@ def index(request, context=None):
 
 @login_required
 def home(request, context=None):
-    """ Return home screen. """
+    """Return home screen."""
     if context is None:
         context = {}
 
@@ -57,7 +57,7 @@ def home(request, context=None):
 
 
 def login_local(request, context=None):
-    """" Create login_local form and return login_local page. """
+    """Create login_local form and return login_local page."""
     if context is None:
         context = {}
     form = LoginUserForm()
@@ -66,7 +66,7 @@ def login_local(request, context=None):
 
 
 def login_local_proc(request):
-    """ Check user is in DB, start session if details correct. """
+    """Check user is in DB, start session if details correct."""
     if request.method == "POST":
         form = LoginUserForm(request.POST)
         if form.is_valid():
@@ -99,7 +99,7 @@ def login_api(request, context=None):
 
 @login_required
 def login_api_proc(request):
-    """" Check API session details, create and store session if correct details. """
+    """Check API session details, create and store session if correct details."""
     if request.method == "POST":
         form = LoginApiForm(request.POST)
         if form.is_valid():
@@ -124,7 +124,7 @@ def login_api_proc(request):
 
 @login_required
 def logout(request):
-    """" Log user out, delete session info. """
+    """Log user out, delete session info."""
     session = request.session.get("ApiSession", None)
     if session is not None:
         session = Session.deserialize(request.session["ApiSession"])
@@ -143,7 +143,7 @@ def logout(request):
 
 @login_required
 def logout_api(request):
-    """ Logs out of FastStats session. """
+    """Logs out of FastStats session."""
     session = request.session.get("ApiSession", None)
     if session is not None:
         session = Session.deserialize(request.session["ApiSession"])
@@ -161,7 +161,7 @@ def logout_api(request):
 
 @login_required
 def example_one(request, context=None):
-    """ Return web page for example one. """
+    """Return web page for example one."""
     if context is None:
         context = {}
 
@@ -184,7 +184,7 @@ def example_one(request, context=None):
 
 @login_required
 def example_one_count(request):
-    """ Return count from user input in example one. """
+    """Return count from user input in example one."""
     if request.method == "POST":
         session = request.session.get("ApiSession", None)
         if session is None:
@@ -194,7 +194,7 @@ def example_one_count(request):
         origin = request.POST["origin_code"]
         dest = request.POST["dest_code"]
 
-        counts_per_year = route_counts(session, origin.upper(), dest.upper())
+        counts_per_year = get_example_one_count(session, origin.upper(), dest.upper())
         context = {
             "count": counts_per_year,
             "selected_origin": origin,
@@ -208,7 +208,7 @@ def example_one_count(request):
 
 @login_required
 def example_two(request, context=None):
-    """ Return web page for example two. """
+    """Return web page for example two."""
     if context is None:
         context = {}
 
@@ -235,7 +235,7 @@ def example_two(request, context=None):
 
 @login_required
 def example_two_graph(request):
-    """ Return graph from user input in example two. """
+    """Return graph from user input in example two."""
     if request.method == "POST":
         session = request.session.get("ApiSession", None)
         if session is None:
@@ -272,7 +272,7 @@ def example_two_graph(request):
 
 @login_required
 def example_three(request, context=None):
-    """ Return web page for example three. """
+    """Return web page for example three."""
     if context is None:
         context = {}
 
@@ -294,7 +294,7 @@ def example_three(request, context=None):
 
 @login_required
 def example_three_map(request):
-    """ Return graph from user input in example three. """
+    """Return graph from user input in example three."""
     # Get selected airport, update context that that one is selected, and encode it
     if request.method == "POST":
         session = request.session.get("ApiSession", None)
@@ -304,7 +304,7 @@ def example_three_map(request):
 
         reporting_airport = request.POST["reporting_airport"]
 
-        df = get_datagrid_as_dataframe(session, reporting_airport.upper())
+        df = get_example_three_dataframe(session, reporting_airport.upper())
         graph_html = make_example_three_map(df)
         context = {"graph": graph_html, "selected_airport": reporting_airport}
         return example_three(request, context)
@@ -313,7 +313,7 @@ def example_three_map(request):
 
 @login_required
 def example_four(request, context=None):
-    """ Return web page for example three. """
+    """Return web page for example three."""
     if context is None:
         context = {}
     session = request.session.get("ApiSession", None)
@@ -340,7 +340,7 @@ def example_four(request, context=None):
 
 @login_required
 def example_four_map(request):
-    """ Return graph from user input in example three. """
+    """Return graph from user input in example three."""
     if request.method == "POST":
         session = request.session.get("ApiSession", None)
         if session is None:
@@ -389,7 +389,7 @@ def start_session(username, password, url, system_name, data_view):
 
 
 def not_logged_in(request):
-    """ Return error page if login required for web page. """
+    """Return error page if login required for web page."""
     context = {
         "alert_type": "alert-danger",
         "alert_message": "The page you were trying to access requires you to login",
@@ -398,7 +398,7 @@ def not_logged_in(request):
 
 
 def incorrect_details(request, page):
-    """ Return context for incorrect login_local on login_local pages. """
+    """Return context for incorrect login_local on login_local pages."""
     context = {
         "alert_type": "alert-danger",
         "alert_message": "Incorrect login details, please try again",
@@ -419,7 +419,7 @@ def no_session_set(request):
 
 
 def encode_variable(var):
-    """ Return variable code from natural language description. """
+    """Return variable code from natural language description."""
     codec = {
         "Reporting Airport": REPORTING_AIRPORT_CODE,
         "Airline Name": AIRLINE_NAME_CODE,
