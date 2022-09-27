@@ -142,5 +142,5 @@ which describes the flight route in the format
 
 ## Credits
 
-App developed by [Aaron MacFarlane](https://github.com/Beeblebroz)  
+App developed by [Aaron MacFarlane](https://github.com/AaronMacF)  
 Edited for public release by [Tim Morris](https://github.com/TimoMorris)
